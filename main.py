@@ -4,24 +4,10 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
 from aiogram.filters.command import Command
 from root import TOKEN
-import sqlite3
 
-DATABASE_FILE = 'user_db.sqlite'
+from db import Database
 
-conn = sqlite3.connect(DATABASE_FILE)
-cursor = conn.cursor()
-
-# Create a table if it doesn't exist
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        full_name VARCHAR(255),
-        username VARCHAR(255),
-        user_id INTEGER
-    )
-''')
-conn.commit()
-
+db = Database("preson.db")
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -30,10 +16,10 @@ dp = Dispatcher()
 @dp.message(Command("start"))
 async def start(message: Message):
     await message.answer("Hello there!")
-    cursor.execute('INSERT INTO messages (full_name, username, user_id) VALUES (?, ?, ?)',
-                   (message.from_user.full_name, message.from_user.username, message.from_user.id))
-    conn.commit()
-    await message.answer("send your telegram data")
+    if not db.user_exists(message.from_user.id):
+        db.add_user(message.from_user.full_name, message.from_user.username, message.from_user.id)
+    else:
+        await message.answer("siz avval ham botga start boshgansiz")
 
 
 async def main():
