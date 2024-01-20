@@ -4,7 +4,9 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
 from aiogram.filters.command import Command
 from root import TOKEN
-
+import qrcode as qr
+import png
+import random
 from db import Database
 
 db = Database("preson.db")
@@ -19,7 +21,8 @@ async def start(message: Message):
     if not db.user_exists(message.from_user.id):
         db.add_user(message.from_user.full_name, message.from_user.username, message.from_user.id)
     else:
-        await message.answer("siz avval ham botga start boshgansiz")
+        await message.answer(" ```siz avval ham botga start boshgansiz```")
+
 
 
 async def main():
